@@ -20,5 +20,6 @@ workflows:
             exit 1
           fi
     artifacts:
-      - ~/build_output/conversion_number.app
+      - ~/build_output/conversion_number.app/
+
 
