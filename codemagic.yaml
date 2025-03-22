@@ -1,0 +1,16 @@
+workflows:
+  macos-release:
+    name: macOS Release Build
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+    environment:
+      flutter: stable
+    scripts:
+      - name: Build macOS App
+        script: flutter build macos --release
+      - name: Move .app file to artifacts
+        script: |
+          mkdir -p ~/build_output
+          cp -R build/macos/Build/Products/Release/Runner.app ~/build_output/
+    artifacts:
+      - ~/build_output/Runner.app
