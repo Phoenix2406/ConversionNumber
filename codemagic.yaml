@@ -8,20 +8,17 @@ workflows:
     scripts:
       - name: Build macOS App
         script: flutter build macos
-      - name: Prevent .zip and extract .app
+      - name: Copy .app to output folder
         script: |
           mkdir -p ~/build_output
-          APP_ZIP="build/macos/Build/Products/Release/Runner.app.zip"
-          APP_FOLDER="build/macos/Build/Products/Release/Runner.app"
-          
-          # If Codemagic creates a ZIP, extract it
-          if [ -f "$APP_ZIP" ]; then
-            unzip -q "$APP_ZIP" -d "build/macos/Build/Products/Release/"
-          fi
-          
-          # Copy the .app to the output folder
+          APP_FOLDER="build/macos/Build/Products/Release/conversion_number.app"
+
           if [ -d "$APP_FOLDER" ]; then
             cp -R "$APP_FOLDER" ~/build_output/
+          else
+            echo "❌ ERROR: .app file not found!"
+            exit 1
           fi
     artifacts:
-      - ~/build_output/*.app
+      - ~/build_output/conversion_number.app
+
