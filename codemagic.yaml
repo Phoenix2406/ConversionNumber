@@ -1,25 +1,39 @@
 workflows:
-  macos-release:
-    name: macOS Release Build
-    instance_type: mac_mini_m1
-    max_build_duration: 120
+  ios-release:
+    name: iOS Release Build
     environment:
       flutter: stable
+      xcode: latest
+      cocoapods: default
     scripts:
-      - name: Build macOS App
-        script: flutter build macos
-      - name: Copy .app to output folder
-        script: |
-          mkdir -p ~/build_output
-          APP_FOLDER="build/macos/Build/Products/Release/conversion_number.app"
-
-          if [ -d "$APP_FOLDER" ]; then
-            cp -R "$APP_FOLDER" ~/build_output/
-          else
-            echo "❌ ERROR: .app file not found!"
-            exit 1
-          fi
+      - flutter clean
+      - flutter pub get
+      - flutter build ios --release --no-codesign
+      - xcode-project build-ipa --workspace=ios/Runner.xcworkspace --scheme=Runner
     artifacts:
-      - ~/build_output/conversion_number.app/
+      - build/ios/ipa/*.ipa
+
+#  macos-release:
+#    name: macOS Release Build
+#    instance_type: mac_mini_m1
+#    max_build_duration: 120
+#    environment:
+#      flutter: stable
+#    scripts:
+#      - name: Build macOS App
+#        script: flutter build macos
+#      - name: Copy .app to output folder
+#        script: |
+#          mkdir -p ~/build_output
+#          APP_FOLDER="build/macos/Build/Products/Release/conversion_number.app"
+#
+#          if [ -d "$APP_FOLDER" ]; then
+#            cp -R "$APP_FOLDER" ~/build_output/
+#          else
+#            echo "❌ ERROR: .app file not found!"
+#            exit 1
+#          fi
+#    artifacts:
+#      - ~/build_output/conversion_number.app/
 
 
