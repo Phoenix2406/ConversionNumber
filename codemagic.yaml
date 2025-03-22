@@ -8,18 +8,9 @@ workflows:
     scripts:
       - name: Build macOS App
         script: flutter build macos
-      - name: Extract `.app` from ZIP (if necessary)
+      - name: Move .app to artifacts
         script: |
           mkdir -p ~/build_output
-          APP_ZIP="build/macos/Build/Products/Release/Runner.app.zip"
-          APP_FOLDER="build/macos/Build/Products/Release/Runner.app"
-          
-          if [ -f "$APP_ZIP" ]; then
-            unzip -q "$APP_ZIP" -d "build/macos/Build/Products/Release/"
-          fi
-          
-          if [ -d "$APP_FOLDER" ]; then
-            cp -R "$APP_FOLDER" ~/build_output/
-          fi
+          cp -R build/macos/Build/Products/Release/*.app ~/build_output/
     artifacts:
       - ~/build_output/*.app
