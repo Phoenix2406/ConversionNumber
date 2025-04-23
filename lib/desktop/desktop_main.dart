@@ -5,41 +5,50 @@ import '../manager/dialog_manager.dart';
 import '../utils/bool_parse.dart';
 
 class DesktopMain extends StatefulWidget {
-  const DesktopMain({super.key, required this.title, required this.isDarkMode, required this.onThemeToggle});
+  final String _title;
+  final bool _isDarkMode;
+  final VoidCallback _themeCallback;
 
-  final String title;
-  final bool isDarkMode;
-  final VoidCallback onThemeToggle;
+  const DesktopMain({
+    super.key,
+    required String title,
+    required bool themeToggle,
+    required VoidCallback onThemeToggle,
+  }) : _title = title,
+       _isDarkMode = themeToggle,
+       _themeCallback = onThemeToggle;
 
   @override
   State<DesktopMain> createState() => _DesktopHomeScreen();
 }
 
 class _DesktopHomeScreen extends State<DesktopMain> {
-
-  List<String> convertOptions = [
+  static final List<String> convertOptions = [
     "Binary to Decimal",
     "Decimal to Binary",
-    "Hexadecimal to Decimal",
-    "Decimal to Hexadecimal",
-    "Hexadecimal to Binary",
     "Binary to Hexadecimal",
-    "Octal to Binary",
+    "Hexadecimal to Binary",
+    "Decimal to Hexadecimal",
+    "Hexadecimal to Decimal",
     "Binary to Octal",
-    "Octal to Decimal",
+    "Octal to Binary",
     "Decimal to Octal",
-    "Octal to Hexadecimal",
+    "Octal to Decimal",
     "Hexadecimal to Octal",
+    "Octal to Hexadecimal",
     "Decimal to BCD",
     "BCD to Decimal",
     "Binary to Gray",
     "Gray to Binary",
-    "Excess3 to Decimal",
+    "Binary to Excess3",
+    "Excess3 to Binary",
     "Decimal to Excess3",
+    "Excess3 to Decimal",
   ];
-  String? convType = "Binary to Decimal";
-  String? number = "";
-  int? isExplain = 0;
+
+  String? convType = convertOptions.first;
+  String? value = "";
+  int? showExplain = 0;
 
   void onDropdownChanged(String? value) {
     setState(() {
@@ -49,72 +58,80 @@ class _DesktopHomeScreen extends State<DesktopMain> {
 
   void onTextFieldChanged(String? value) {
     setState(() {
-      number = value;
+      this.value = value;
     });
   }
 
   void onRadioButtonChanged(int? value) {
     setState(() {
-      isExplain = value;
+      showExplain = value;
     });
   }
 
   Future<void> onShowExplainButtonPressed(BuildContext context) {
     return DialogManager(
-        context: context,
-        title: "Coming Soon",
-        content: "Explanation of number conversion stages still under progress!",
-        isDarkMode: widget.isDarkMode)
-        .create();
+      context: context,
+      title: "Coming Soon",
+      content: "Explanation of number conversion stages still under progress!",
+      themeToggle: widget._isDarkMode,
+    ).create();
   }
 
   Future<void> onConvertButtonPressed(BuildContext context) async {
-    if (number!.isEmpty) {
+    if (value!.isEmpty) {
       return DialogManager(
-          context: context,
-          title: "Conversion Alert",
-          content: "Number value can't be empty!",
-          isDarkMode: widget.isDarkMode)
-          .create();
+        context: context,
+        title: "Conversion Alert",
+        content: "Number value can't be empty!",
+        themeToggle: widget._isDarkMode,
+      ).create();
     }
 
     List<String> convertType = convType!.split(' to ');
-    ConvertType convFrom = ConvertType.values.byName(convertType[0].toLowerCase());
-    ConvertType convTo = ConvertType.values.byName(convertType[1].toLowerCase());
+    ConvertType convFrom = ConvertType.values.byName(
+      convertType[0].toLowerCase(),
+    );
+    ConvertType convTo = ConvertType.values.byName(
+      convertType[1].toLowerCase(),
+    );
 
-    String? conversion = ConversionManager(
-      value: number!,
-      convertFrom: convFrom,
-      convertTo: convTo,
-      showExplain: isExplain == 0 ? false : true,
-    ).convert();
+    String? conversion =
+        ConversionManager(
+          value: value!,
+          from: convFrom,
+          to: convTo,
+          explain: showExplain == 0 ? false : true,
+          themeToggle: widget._isDarkMode,
+        ).convert();
 
     return DialogManager(
-        context: context,
-        title: "Conversion Result",
-        content: "Conversion from ${convFrom.name} to ${convTo.name} "
-            "of $number${convFrom.symbol} is $conversion${convTo.symbol}",
-        isDarkMode: widget.isDarkMode)
-        .create();
+      context: context,
+      title: "Conversion Result",
+      content:
+          "Conversion from ${convFrom.name} to ${convTo.name} "
+          "of $value${convFrom.symbol} is $conversion${convTo.symbol}",
+      themeToggle: widget._isDarkMode,
+    ).create();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget._title),
         actions: <Widget>[
           Padding(
             padding: EdgeInsets.only(right: 10),
             child: IconButton(
-              onPressed: widget.onThemeToggle,
+              onPressed: widget._themeCallback,
               icon: AnimatedSwitcher(
                 duration: Duration(milliseconds: 500),
                 transitionBuilder: (child, animation) {
                   return ScaleTransition(scale: animation, child: child);
                 },
-                child: Icon(widget.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                  key: ValueKey(widget.isDarkMode),
+                child: Icon(
+                  widget._isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  key: ValueKey(widget._isDarkMode),
                 ),
               ),
             ),
@@ -127,74 +144,92 @@ class _DesktopHomeScreen extends State<DesktopMain> {
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(top: 10.0),
-              child: Text("Number Conversion",
-                  style: TextStyle(
-                      fontSize: 50.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color)),
+              child: Text(
+                "Number Conversion",
+                style: TextStyle(
+                  fontSize: 50.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                ),
+              ),
             ),
             Container(
               margin: EdgeInsets.only(top: 50.0),
               width: 300,
               child: Column(
                 children: <Widget>[
-                  Text("Choose Conversion Type",
-                      style: TextStyle(
-                          fontSize: 25.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color)
+                  Text(
+                    "Choose Conversion Type",
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                   ),
                   DropdownButtonFormField(
-                      value: convType,
-                      isExpanded: true,
-                      menuMaxHeight: 400,
-                      items: convertOptions.map((String val) {
-                        return DropdownMenuItem(
-                          value: val,
-                          child: Row(
-                            children: <Widget>[
-                              Text(val),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) { onDropdownChanged(value); },
-                      dropdownColor: Theme.of(context).dropdownMenuTheme.menuStyle?.backgroundColor?.resolve({}),
-                      style: TextStyle(
-                        fontStyle: FontStyle.normal, color: Theme.of(context).textTheme.titleLarge?.color,
-                      ),
-                      icon: Icon(Icons.arrow_drop_down,
-                          color: widget.isDarkMode
-                            ? Colors.purple
-                            : Colors.deepPurpleAccent),
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: widget.isDarkMode
+                    value: convType,
+                    isExpanded: true,
+                    menuMaxHeight: 400,
+                    items:
+                        convertOptions.map((String val) {
+                          return DropdownMenuItem(
+                            value: val,
+                            child: Row(children: <Widget>[Text(val)]),
+                          );
+                        }).toList(),
+                    onChanged: (String? value) {
+                      onDropdownChanged(value);
+                    },
+                    dropdownColor: Theme.of(
+                      context,
+                    ).dropdownMenuTheme.menuStyle?.backgroundColor?.resolve({}),
+                    style: TextStyle(
+                      fontStyle: FontStyle.normal,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color:
+                          widget._isDarkMode
                               ? Colors.purple
-                              : Colors.deepPurpleAccent, width: 2)
+                              : Colors.deepPurpleAccent,
+                    ),
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color:
+                              widget._isDarkMode
+                                  ? Colors.purple
+                                  : Colors.deepPurpleAccent,
+                          width: 2,
                         ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: widget.isDarkMode
-                              ? Colors.purple
-                              : Colors.deepPurpleAccent, width: 2)
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color:
+                              widget._isDarkMode
+                                  ? Colors.purple
+                                  : Colors.deepPurpleAccent,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                  Container(
-                    height: 15.0,
+                  Container(height: 15.0),
+                  Text(
+                    "Input Number",
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                   ),
-                  Text("Input Number",
-                      style: TextStyle(
-                          fontSize: 25.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color)
-                  ),
-                  Container(
-                    height: 5.0,
-                  ),
+                  Container(height: 5.0),
                   TextField(
                     maxLength: 25,
                     style: TextStyle(
                       fontStyle: FontStyle.normal,
-                      color: Theme
-                          .of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.color,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                     onChanged: (String value) {
                       onTextFieldChanged(value);
@@ -203,42 +238,45 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                       hintText: "Input number value",
                       labelText: "Number Value",
                       hintStyle: TextStyle(
-                        fontStyle: FontStyle.normal, color: Theme.of(context).textTheme.titleLarge?.color,
+                        fontStyle: FontStyle.normal,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                       labelStyle: TextStyle(
-                        fontStyle: FontStyle.normal, color: Theme.of(context).textTheme.titleLarge?.color,
+                        fontStyle: FontStyle.normal,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                       counterStyle: TextStyle(
                         fontStyle: FontStyle.normal,
-                        color:
-                        Theme
-                            .of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.color,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: widget.isDarkMode
+                        borderSide: BorderSide(
+                          color:
+                              widget._isDarkMode
                                   ? Colors.purple
                                   : Colors.deepPurpleAccent,
-                              width: 2)
+                          width: 2,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: widget.isDarkMode
+                        borderSide: BorderSide(
+                          color:
+                              widget._isDarkMode
                                   ? Colors.purple
                                   : Colors.deepPurpleAccent,
-                              width: 2)
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
-                  Container(
-                    height: 15.0,
-                  ),
-                  Text("Show Explain?",
-                      style: TextStyle(
-                          fontSize: 25.0, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color)
+                  Container(height: 15.0),
+                  Text(
+                    "Show Explain?",
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -248,7 +286,7 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                         children: <Widget>[
                           Radio(
                             value: 0,
-                            groupValue: isExplain,
+                            groupValue: showExplain,
                             onChanged: (int? value) {
                               onRadioButtonChanged(value);
                             },
@@ -258,11 +296,7 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                             style: TextStyle(
                               fontSize: 15.0,
                               color:
-                              Theme
-                                  .of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.color,
+                                  Theme.of(context).textTheme.titleLarge?.color,
                             ),
                           ),
                         ],
@@ -273,7 +307,7 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                         children: <Widget>[
                           Radio(
                             value: 1,
-                            groupValue: isExplain,
+                            groupValue: showExplain,
                             onChanged: (int? value) {
                               onRadioButtonChanged(value);
                             },
@@ -283,11 +317,7 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                             style: TextStyle(
                               fontSize: 15.0,
                               color:
-                              Theme
-                                  .of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.color,
+                                  Theme.of(context).textTheme.titleLarge?.color,
                             ),
                           ),
                         ],
@@ -305,35 +335,40 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                   FilledButton(
                     style: ButtonStyle(
                       minimumSize: WidgetStateProperty.all(Size(150, 50)),
-                      backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-                            (Set<WidgetState> states) {
-                          if (states.contains(WidgetState.disabled)) {
-                            return widget.isDarkMode
-                                ? Colors.purple.withValues(alpha: 0.5)
-                                : Colors.deepPurpleAccent.withValues(alpha: 0.5);
-                          }
-                          return widget.isDarkMode
-                              ? Colors.purple
-                              : Colors.deepPurpleAccent;
-                        },
-                      ),
+                      backgroundColor: WidgetStateProperty.resolveWith<Color?>((
+                        Set<WidgetState> states,
+                      ) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return widget._isDarkMode
+                              ? Colors.purple.withValues(alpha: 0.5)
+                              : Colors.deepPurpleAccent.withValues(alpha: 0.5);
+                        }
+                        return widget._isDarkMode
+                            ? Colors.purple
+                            : Colors.deepPurpleAccent;
+                      }),
                     ),
-                    onPressed: Boolean.parse(isExplain!) ? () {
-                      onShowExplainButtonPressed(context);
-                    } : null,
+                    onPressed:
+                        Boolean.parse(showExplain!)
+                            ? () {
+                              onShowExplainButtonPressed(context);
+                            }
+                            : null,
                     child: Text(
                       "Show Explanation",
                       style: TextStyle(
-                        color: Boolean.parse(isExplain!) ?
-                        Theme.of(context).textTheme.titleLarge?.color :
-                        Theme.of(context).textTheme.titleLarge?.color?.withValues(alpha: 0.5),
+                        color:
+                            Boolean.parse(showExplain!)
+                                ? Theme.of(context).textTheme.titleLarge?.color
+                                : Theme.of(context).textTheme.titleLarge?.color
+                                    ?.withValues(alpha: 0.5),
                       ),
                     ),
                   ),
                   Container(width: 50.0),
                   FilledButton(
                     style: ButtonStyle(
-                        minimumSize: WidgetStateProperty.all(Size(150, 50))
+                      minimumSize: WidgetStateProperty.all(Size(150, 50)),
                     ),
                     onPressed: () {
                       onConvertButtonPressed(context);
@@ -341,12 +376,7 @@ class _DesktopHomeScreen extends State<DesktopMain> {
                     child: Text(
                       "Convert",
                       style: TextStyle(
-                        color:
-                        Theme
-                            .of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.color,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                     ),
                   ),
