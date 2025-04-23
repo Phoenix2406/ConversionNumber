@@ -35,15 +35,17 @@ class DialogManager {
               child: Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: _isDarkMode
-                      ? Colors.purple[600]
-                      : Colors.deepPurpleAccent[400],
+                  color:
+                      _isDarkMode
+                          ? Colors.purple[600]
+                          : Colors.deepPurpleAccent[400],
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: _isDarkMode
-                          ? Colors.purple[600]!
-                          : Colors.deepPurpleAccent[400]!,
+                      color:
+                          _isDarkMode
+                              ? Colors.purple[600]!
+                              : Colors.deepPurpleAccent[400]!,
                       blurRadius: 30,
                       spreadRadius: 5,
                     ),
@@ -52,7 +54,8 @@ class DialogManager {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(_title,
+                    Text(
+                      _title,
                       style: TextStyle(
                         fontSize: 21.0,
                         fontWeight: FontWeight.bold,
@@ -60,28 +63,33 @@ class DialogManager {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Text(_content,
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: Theme.of(_context).textTheme.titleLarge?.color,
-                        ),
-                        softWrap: true,
-                        textAlign: TextAlign.center),
+                    Text(
+                      _content,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Theme.of(_context).textTheme.titleLarge?.color,
+                      ),
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                    ),
                     SizedBox(height: 32),
                     Align(
                       alignment: Alignment.bottomRight,
                       child: TextButton(
                         style: ButtonStyle(
-                            minimumSize: Platform.isWindows || Platform.isMacOS ?
-                            WidgetStateProperty.all(Size(100, 40)) :
-                            WidgetStateProperty.all(Size(100, 15))
+                          minimumSize:
+                              Platform.isWindows || Platform.isMacOS
+                                  ? WidgetStateProperty.all(Size(100, 40))
+                                  : WidgetStateProperty.all(Size(100, 15)),
                         ),
                         onPressed: () {
                           Navigator.of(ctx).pop();
                         },
-                        child: Text("Close",
+                        child: Text(
+                          "Close",
                           style: TextStyle(
-                            color: Theme.of(_context).textTheme.titleLarge?.color,
+                            color:
+                                Theme.of(_context).textTheme.titleLarge?.color,
                           ),
                         ),
                       ),
