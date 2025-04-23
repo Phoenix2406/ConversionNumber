@@ -3,20 +3,26 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class DialogManager {
-  final BuildContext context;
-  final String title;
-  final String content;
-  final bool isDarkMode;
+  late BuildContext _context;
+  late String _title;
+  late String _content;
+  late bool _isDarkMode;
 
   DialogManager({
-    required this.context,
-    required this.title,
-    required this.content,
-    required this.isDarkMode});
+    required BuildContext context,
+    required String title,
+    required String content,
+    required bool themeToggle,
+  }) {
+    _context = context;
+    _title = title;
+    _content = content;
+    _isDarkMode = themeToggle;
+  }
 
   Future<void> create() {
     return showDialog(
-      context: context,
+      context: _context,
       barrierDismissible: false,
       builder:
           (ctx) => Dialog(
@@ -29,13 +35,13 @@ class DialogManager {
               child: Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: isDarkMode
+                  color: _isDarkMode
                       ? Colors.purple[600]
                       : Colors.deepPurpleAccent[400],
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: isDarkMode
+                      color: _isDarkMode
                           ? Colors.purple[600]!
                           : Colors.deepPurpleAccent[400]!,
                       blurRadius: 30,
@@ -46,18 +52,18 @@ class DialogManager {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(title,
+                    Text(_title,
                       style: TextStyle(
                         fontSize: 21.0,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        color: Theme.of(_context).textTheme.titleLarge?.color,
                       ),
                     ),
                     SizedBox(height: 10),
-                    Text(content,
+                    Text(_content,
                         style: TextStyle(
                           fontSize: 16.0,
-                          color: Theme.of(context).textTheme.titleLarge?.color,
+                          color: Theme.of(_context).textTheme.titleLarge?.color,
                         ),
                         softWrap: true,
                         textAlign: TextAlign.center),
@@ -75,7 +81,7 @@ class DialogManager {
                         },
                         child: Text("Close",
                           style: TextStyle(
-                            color: Theme.of(context).textTheme.titleLarge?.color,
+                            color: Theme.of(_context).textTheme.titleLarge?.color,
                           ),
                         ),
                       ),
