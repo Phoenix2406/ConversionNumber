@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../desktop/desktop_main.dart';
@@ -15,7 +16,7 @@ void main() {
     DeviceOrientation.portraitDown,
   ]).then((_) async {
     bool isDark = await getSavedTheme();
-    runApp(MyApp(isDark));
+    runApp(MyApp(isDark: isDark));
   });
 }
 
@@ -25,8 +26,9 @@ Future<bool> getSavedTheme() async {
 }
 
 class MyApp extends StatefulWidget {
-  final bool isDark;
-  const MyApp(this.isDark, {super.key});
+  final bool _themeToggle;
+
+  const MyApp({super.key, required bool isDark}) : _themeToggle = isDark;
 
   @override
   State<MyApp> createState() => _MainHomeScreen();
@@ -38,7 +40,7 @@ class _MainHomeScreen extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _isDarkMode = widget.isDark;
+    _isDarkMode = widget._themeToggle;
   }
 
   void _toggleTheme() async {
@@ -52,7 +54,12 @@ class _MainHomeScreen extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedTheme(
+    return OKToast(
+      backgroundColor:
+          _isDarkMode
+              ? Colors.purple.withValues(alpha: 0.8)
+              : Colors.deepPurpleAccent.withValues(alpha: 0.8),
+      child: AnimatedTheme(
         data: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
         duration: Duration(milliseconds: 500),
         child: MaterialApp(
@@ -62,27 +69,79 @@ class _MainHomeScreen extends State<MyApp> {
             scaffoldBackgroundColor: Colors.white,
             appBarTheme: AppBarTheme(backgroundColor: Colors.deepPurpleAccent),
             textTheme: TextTheme(titleLarge: TextStyle(color: Colors.black)),
-            textSelectionTheme: TextSelectionThemeData(cursorColor: Colors.deepPurpleAccent, selectionColor: Colors.deepPurpleAccent.withValues(alpha: 0.3), selectionHandleColor: Colors.deepPurpleAccent),
-            radioTheme: RadioThemeData(fillColor: WidgetStatePropertyAll<Color>(Colors.deepPurpleAccent)),
-            filledButtonTheme: FilledButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.deepPurpleAccent))),
-            textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.deepPurpleAccent))),
-            dropdownMenuTheme: DropdownMenuThemeData(menuStyle: MenuStyle(backgroundColor: WidgetStateProperty.all(Colors.deepPurpleAccent))),
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: Colors.deepPurpleAccent,
+              selectionColor: Colors.deepPurpleAccent.withValues(alpha: 0.3),
+              selectionHandleColor: Colors.deepPurpleAccent,
+            ),
+            radioTheme: RadioThemeData(
+              fillColor: WidgetStatePropertyAll<Color>(Colors.deepPurpleAccent),
+            ),
+            filledButtonTheme: FilledButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll<Color>(
+                  Colors.deepPurpleAccent,
+                ),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll<Color>(
+                  Colors.deepPurpleAccent,
+                ),
+              ),
+            ),
+            dropdownMenuTheme: DropdownMenuThemeData(
+              menuStyle: MenuStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Colors.deepPurpleAccent,
+                ),
+              ),
+            ),
           ),
           darkTheme: ThemeData(
             scaffoldBackgroundColor: Colors.white12,
             appBarTheme: AppBarTheme(backgroundColor: Colors.purple),
             textTheme: TextTheme(titleLarge: TextStyle(color: Colors.white)),
-            textSelectionTheme: TextSelectionThemeData(cursorColor: Colors.purple, selectionColor: Colors.purple.withValues(alpha: 0.3), selectionHandleColor: Colors.purple),
-            radioTheme: RadioThemeData(fillColor: WidgetStatePropertyAll<Color>(Colors.purple)),
-            filledButtonTheme: FilledButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.purple))),
-            textButtonTheme: TextButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.purple))),
-            dropdownMenuTheme: DropdownMenuThemeData(menuStyle: MenuStyle(backgroundColor: WidgetStateProperty.all(Colors.purple))),
+            textSelectionTheme: TextSelectionThemeData(
+              cursorColor: Colors.purple,
+              selectionColor: Colors.purple.withValues(alpha: 0.3),
+              selectionHandleColor: Colors.purple,
+            ),
+            radioTheme: RadioThemeData(
+              fillColor: WidgetStatePropertyAll<Color>(Colors.purple),
+            ),
+            filledButtonTheme: FilledButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll<Color>(Colors.purple),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll<Color>(Colors.purple),
+              ),
+            ),
+            dropdownMenuTheme: DropdownMenuThemeData(
+              menuStyle: MenuStyle(
+                backgroundColor: WidgetStateProperty.all(Colors.purple),
+              ),
+            ),
           ),
           themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          home: Platform.isWindows || Platform.isMacOS
-              ? DesktopMain(title: "Conversion Number System", isDarkMode: _isDarkMode, onThemeToggle: _toggleTheme)
-              : MobileMain(title: "Conversion Number System", isDarkMode: _isDarkMode, onThemeToggle: _toggleTheme),
+          home:
+              Platform.isWindows || Platform.isMacOS
+                  ? DesktopMain(
+                    title: "Conversion Number System",
+                    themeToggle: _isDarkMode,
+                    onThemeToggle: _toggleTheme,
+                  )
+                  : MobileMain(
+                    title: "Conversion Number System",
+                    themeToggle: _isDarkMode,
+                    themeCallback: _toggleTheme,
+                  ),
         ),
+      ),
     );
   }
 }
